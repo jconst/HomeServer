@@ -29,7 +29,7 @@ def set_lr_tree_brightness(brightness):
 
 @app.route('/')
 def list_scenes():
-  return make_response(str(get_db()), 200)
+  return make_response(str(load_db()), 200)
 
 @app.route('/huescenes')
 def hue_scenes():
@@ -42,16 +42,16 @@ def hue_scenes():
 def put_scene(scene_name):
   if scene_name == None:
     return make_response('format: /scenes/<scene>', 400)
-  db_get(scene_name) = request.get_json()
+  db_set(scene_name, request.get_json())
   return 'OK'
 
 @app.route('/currentscene', methods=['PUT'])
 def set_scene():
   scene = request.data
 
-  set_lr_tree_brightness(get_db()[scene]['lr_tree'])
+  set_lr_tree_brightness(db_get(scene)['lr_tree'])
 
-  hue_scene = get_db()[scene]['hue_scene']
+  hue_scene = db_get(scene)['hue_scene']
   resource = {
     'which': 0,
     'data': {
@@ -60,15 +60,14 @@ def set_scene():
       }
     }
   }
-  if scene == 'off':
-    resource['data']['action'] = {'on': False}
+  #resource['data']['action'] = {'on': False if scene == "off" else True}
   response = bridge.group.update(resource)
   success = 'success' in response['resource'][0]
   return 'OK' if success else make_response(str(response), 500)
 
 @app.route('/living-room-ip', methods=['PUT'])
 def set_living_room_ip():
-  get_db()['lr_tree_ip'] = request.data
+  db_set('lr_tree_ip', request.data)
   return 'OK'
 
 ### STORAGE: ###
@@ -88,7 +87,7 @@ def load_db():
   return {}
 
 def save_db(db):
-  with open('scenes.json', 'w') as fp:
+  with open('scenes-out.json', 'w') as fp:
     json.dumps(db, fp, sort_keys=True, indent=4)
 
 setup()
