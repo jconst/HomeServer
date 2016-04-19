@@ -8,6 +8,8 @@ from flask import Flask, Response, request, make_response
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
+### SETUP: ###
+
 def setup():
   global bridge
   bridge = create_bridge()
@@ -44,7 +46,7 @@ def hue_scenes():
 def put_scene(scene_name):
   if scene_name == None:
     return make_response('format: /scenes/<scene>', 400)
-  get_db()[scene_name] = request.get_json()
+  db_get(scene_name) = request.get_json()
   return 'OK'
 
 @app.route('/currentscene', methods=['PUT'])
@@ -73,8 +75,25 @@ def set_living_room_ip():
   get_db()['lr_tree_ip'] = request.data
   return 'OK'
 
-def get_db():
-  db = shelve.open('scenes.db')
+### STORAGE: ###
+
+def db_get(key):
+  db = load_db()
+  return db[key]
+
+def db_set(key, value):
+  db = load_db()
+  db[key] = value
+  save_db(db)
+
+def load_db():
+  with open('scenes.json', 'r') as fp:
+    return json.load(fp)
+  return {}
+
+def save_db(db):
+  with open('scenes.json', 'w') as fp:
+    json.dumps(db, fp, sort_keys=True, indent=4)
 
 setup()
 
