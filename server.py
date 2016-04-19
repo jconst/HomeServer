@@ -87,8 +87,8 @@ def load_db():
   return {}
 
 def save_db(db):
-  with open('scenes-out.json', 'w') as fp:
-    json.dumps(db, fp, sort_keys=True, indent=4)
+  with open('scenes.json', 'w') as fp:
+    json.dump(db, fp, sort_keys=True, indent=4)
 
 setup()
 
