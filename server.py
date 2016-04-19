@@ -15,14 +15,10 @@ def setup():
   bridge = create_bridge()
 
 def create_bridge():
-  bridge_addr = discover_bridge_ip()
+  bridge_addr = '192.168.0.110'
   bridge = Bridge(device={'ip':bridge_addr}, 
                   user={'name':'2bb6465d7c479351631cd18e4daad16f'})
   return bridge
-
-def discover_bridge_ip():
-  resp = requests.get('https://www.meethue.com/api/nupnp')
-  return resp.json()[0]['internalipaddress']
 
 def set_lr_tree_brightness(brightness):
   pass
@@ -98,4 +94,4 @@ def save_db(db):
 setup()
 
 if __name__ == "__main__":
-  app.run()
+  app.run('0.0.0.0')
