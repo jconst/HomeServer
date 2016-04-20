@@ -21,9 +21,8 @@ def create_bridge():
   return bridge
 
 def set_lr_tree_brightness(brightness):
-  pass
-  # ip = get_db()['lr_tree_ip']
-  # requests.get(ip + '?b=' + brightness)
+  ip = '192.168.0.120'
+  requests.post(ip, data=str(brightness))
 
 ### ROUTES: ###
 
