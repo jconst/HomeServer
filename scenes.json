@@ -1,19 +1,18 @@
 {
     "beach": {
-        "hue_scene": "0a54b1e8f",
+        "hue_scene": "2c1ed76af", 
         "lr_tree": 0.8
-    },
+    }, 
     "deep_sea": {
-        "hue_scene": "07e083aee",
+        "hue_scene": "07e083aee", 
         "lr_tree": 0.8
-    },
+    }, 
     "normal": {
-        "hue_scene": "5be16d344",
+        "hue_scene": "254808f91", 
         "lr_tree": 0.8
-    },
+    }, 
     "off": {
-        "hue_scene": "1d34a4b69",
+        "hue_scene": "1d34a4b69", 
         "lr_tree": 0
     }
 }
-

@@ -1,8 +1,11 @@
 #!/usr/bin/env python
-import requests
 import json
+import re
+import requests
 import shelve
+import time
 from beautifulhue.api import Bridge
+from datetime import datetime
 from flask import Flask, Response, request, make_response
 
 app = Flask(__name__)
@@ -21,8 +24,8 @@ def create_bridge():
   return bridge
 
 def set_lr_tree_brightness(brightness):
-  ip = '192.168.0.120'
-  requests.post(ip, data=str(brightness))
+  url = 'http://192.168.0.120/'
+  requests.post(url, data=str(brightness))
 
 ### ROUTES: ###
 
@@ -64,10 +67,21 @@ def set_scene():
   success = 'success' in response['resource'][0]
   return 'OK' if success else make_response(str(response), 500)
 
-@app.route('/living-room-ip', methods=['PUT'])
-def set_living_room_ip():
-  db_set('lr_tree_ip', request.data)
-  return 'OK'
+@app.route('/syncscenes', methods=['POST'])
+def sync_scenes():
+  resp = ''
+  hue_scenes = bridge.scene.get({'which': 'all'})['resource']
+  scenes = load_db()
+  for key, params in scenes.iteritems():
+    cur_hs = next(hs for hs in hue_scenes if hs['id'].startswith(params['hue_scene']))
+    hue_name = re.match('(.+) on \d', cur_hs['name']).group(1)
+    matching_hss = [hs for hs in hue_scenes if hs['name'].startswith(hue_name) and hs['lastupdated']]
+    date_for_hs = lambda x: datetime.strptime(x['lastupdated'], '%Y-%m-%dT%H:%M:%S')
+    latest_hs = max(matching_hss, key=date_for_hs)
+    params['hue_scene'] = re.match('(\w+)-on-\d', latest_hs['id']).group(1)
+    resp = resp + key + ': ' + str(latest_hs) + '\n'
+    db_set(key, params)
+  return resp
 
 ### STORAGE: ###
 
